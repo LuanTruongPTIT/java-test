@@ -30,31 +30,19 @@ public class TutorDao {
   public List<Tutor> read() {
     List<Tutor> tutorList = new ArrayList<>();
     File file = new File(TUTOR_FILE_NAME);
-    if (!file.exists()) {
-      try {
-        file.createNewFile(); // Tạo tệp mới nếu chưa tồn tại
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      return tutorList; // Trả về danh sách trống nếu tệp không tồn tại
+    if (file.length() == 0) {
+      return tutorList; // Trả về danh sách rỗng nếu file rỗng
     }
 
-    FileInputStream fis = null;
-    ObjectInputStream ois = null;
-    try {
-      fis = new FileInputStream(file);
-      ois = new ObjectInputStream(fis);
+    try (FileInputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = new ObjectInputStream(fis)) {
       tutorList = (List<Tutor>) ois.readObject();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
-    } catch (IOException e) {
+    } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    } finally {
-      closeStream(fis);
-      closeStream(ois);
     }
+
     return tutorList;
   }
 
